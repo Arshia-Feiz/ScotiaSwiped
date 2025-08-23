@@ -63,7 +63,7 @@ const mockSubscriptions = [
       "Looking for someone who won't judge my 3am true crime binges. Must love long walks through endless scrolling and commitment issues with finishing series.",
     isKnownPartner: false,
     isBigCompany: true,
-    logo: "/netflix-inspired-logo.png",
+    logo: "/netflix-inspired-logo.svg",
     flags: ["recurring_12_months"],
     monthsActive: 24,
   },
@@ -75,7 +75,7 @@ const mockSubscriptions = [
       "Music lover seeking someone who appreciates my 47 different playlists for every mood. Warning: I will judge your Spotify Wrapped.",
     isKnownPartner: false,
     isBigCompany: true,
-    logo: "/spotify-logo.png",
+    logo: "/spotify-logo.svg",
     flags: ["recurring_12_months"],
     monthsActive: 18,
   },
@@ -87,7 +87,7 @@ const mockSubscriptions = [
       "Grocery delivery enthusiast who's given up on adulting. Looking for someone who understands that cereal counts as dinner. Scene+ points included! 💎",
     isKnownPartner: true,
     isBigCompany: false,
-    logo: "/sobeys-logo.png",
+    logo: "/sobeys-logo.svg",
     flags: ["scene_partner"],
     monthsActive: 6,
     scenePointsMonthly: 150,
@@ -100,7 +100,7 @@ const mockSubscriptions = [
       "Seeking someone who won't judge me for crying during Pixar movies. Must be okay with my extensive Disney+ watchlist and occasional princess sing-alongs.",
     isKnownPartner: false,
     isBigCompany: true,
-    logo: "/disney-plus-logo.png",
+    logo: "/disney-plus-logo.svg",
     flags: ["recurring_6_months"],
     monthsActive: 8,
   },
@@ -112,7 +112,7 @@ const mockSubscriptions = [
       "Red flag alert! 🚩 I literally have no idea what this is or when I signed up. Probably happened during a late-night online shopping spree. Help?",
     isKnownPartner: false,
     isBigCompany: false,
-    logo: "/mysterious-app-icon.png",
+    logo: "/mysterious-app-icon.svg",
     flags: ["suspicious", "new_transaction", "high_cost"],
     monthsActive: 1,
   },
@@ -124,7 +124,7 @@ const mockSubscriptions = [
       "DIY disaster specialist looking for someone who won't laugh at my crooked shelves. Scene+ partner with benefits (literally - points!)! 🔨✨",
     isKnownPartner: true,
     isBigCompany: false,
-    logo: "/home-hardware-logo.png",
+    logo: "/home-hardware-logo.svg",
     flags: ["scene_partner"],
     monthsActive: 3,
     scenePointsMonthly: 75,
@@ -137,7 +137,7 @@ const mockSubscriptions = [
       "Gym membership for my phone. Been paying for 8 months, used it twice. Looking for motivation or someone to cancel this for me.",
     isKnownPartner: false,
     isBigCompany: false,
-    logo: "/placeholder-z666r.png",
+    logo: "/placeholder.svg",
     flags: ["price_increase"],
     monthsActive: 8,
     previousCost: 14.99,
@@ -147,24 +147,24 @@ const mockSubscriptions = [
 const scotiaWrappedStories = [
   {
     id: 1,
+    title: "Scene+ Champion",
+    content: "You earned 2,700 Scene+ points",
+    subtitle: "From Sobeys & Home Hardware subscriptions",
+    background: "bg-gradient-to-br from-red-500 via-black to-red-800",
+  },
+  {
+    id: 2,
     title: "Your 2024 Spending",
     content: "You spent $2,847.52 on subscriptions this year",
     subtitle: "That's like buying 142 coffees ☕",
     background: "bg-gradient-to-br from-red-600 via-red-700 to-black",
   },
   {
-    id: 2,
+    id: 3,
     title: "Most Expensive",
     content: "MysteryApp Pro",
     subtitle: "$29.99/month • You questioned this 47 times",
     background: "bg-gradient-to-br from-black via-red-900 to-red-600",
-  },
-  {
-    id: 3,
-    title: "Scene+ Champion",
-    content: "You earned 2,700 Scene+ points",
-    subtitle: "From Sobeys & Home Hardware subscriptions",
-    background: "bg-gradient-to-br from-red-500 via-black to-red-800",
   },
   {
     id: 4,
@@ -213,7 +213,7 @@ function ScotiaBankingHomepage({
       {/* Header */}
       <div className="bg-red-600 px-4 py-6">
         <div className="flex justify-between items-center mb-4">
-          <div className="text-white font-bold text-2xl">S</div>
+          <img src="/logo_scotia.png" alt="Scotiabank" className="h-10 w-auto brightness-0 invert" />
           <Button
             variant="outline"
             className="bg-transparent border-white text-white hover:bg-white/10 rounded-full px-4 py-2 text-sm"
@@ -781,6 +781,7 @@ export default function App() {
   const [showUnknownModal, setShowUnknownModal] = useState(false)
   const [showSceneModal, setShowSceneModal] = useState(false)
   const [currentSubscription, setCurrentSubscription] = useState<(typeof mockSubscriptions)[0] | null>(null)
+  const [recognizedTransactions, setRecognizedTransactions] = useState<Set<number>>(new Set())
 
   const currentIndexRef = useMemo(() => currentIndex, [currentIndex])
   const canGoBack = currentIndex < mockSubscriptions.length - 1
@@ -829,26 +830,31 @@ export default function App() {
       }))
       setCurrentIndex(index - 1)
     } else if (direction === "left") {
-      // Always immediately add to cancelled list and remove card
-      setSwipedSubscriptions((prev) => ({
-        ...prev,
-        cancelled: [...prev.cancelled, subscription],
-      }))
-      setCurrentIndex(index - 1)
-
       // Set current subscription for modal handling
       setCurrentSubscription(subscription)
 
-      // Handle different swipe left scenarios with modals but don't redirect
-      if (subscription.isBigCompany) {
-        // Big company - no modal, just cancelled
-        // Links will be shown in summary page
-      } else if (subscription.isKnownPartner) {
-        // Scene+ partner - show points loss modal for information only
+      // Handle different swipe left scenarios with modals
+      if (subscription.isKnownPartner) {
+        // Scene+ partner - add to cancelled and show points loss modal
+        setSwipedSubscriptions((prev) => ({
+          ...prev,
+          cancelled: [...prev.cancelled, subscription],
+        }))
         setShowSceneModal(true)
-      } else {
-        // Unknown/small business - show recognition modal for information only
+      } else if (subscription.flags.includes("suspicious")) {
+        // Suspicious transactions - add to cancelled and show recognition modal
+        setSwipedSubscriptions((prev) => ({
+          ...prev,
+          cancelled: [...prev.cancelled, subscription],
+        }))
         setShowUnknownModal(true)
+      } else {
+        // Non-suspicious, non-Scene+ transactions (like Netflix) - add to cancelled and go directly to results
+        setSwipedSubscriptions((prev) => ({
+          ...prev,
+          cancelled: [...prev.cancelled, subscription],
+        }))
+        setCurrentIndex(index - 1)
       }
     }
 
@@ -861,17 +867,21 @@ export default function App() {
   const handleUnknownRecognize = (recognized: boolean) => {
     if (currentSubscription) {
       if (recognized) {
-        // Treat as keep
+        // Treat as keep - remove from cancelled and add to kept
         setSwipedSubscriptions((prev) => ({
           ...prev,
+          cancelled: prev.cancelled.filter(sub => sub.id !== currentSubscription.id),
           kept: [...prev.kept, currentSubscription],
         }))
+        // Mark as recognized for link display
+        setRecognizedTransactions(prev => new Set([...prev, currentSubscription.id]))
       } else {
-        // Treat as cancel with fraud warning
-        setSwipedSubscriptions((prev) => ({
-          ...prev,
-          cancelled: [...prev.cancelled, currentSubscription],
-        }))
+        // Already in cancelled list, just mark as not recognized for fraud link display
+        setRecognizedTransactions(prev => {
+          const newSet = new Set(prev)
+          newSet.delete(currentSubscription.id)
+          return newSet
+        })
       }
       setCurrentIndex(currentIndex - 1)
     }
@@ -882,16 +892,13 @@ export default function App() {
   const handleSceneConfirm = (confirmed: boolean) => {
     if (currentSubscription) {
       if (confirmed) {
-        // Cancel Scene+ partner
-        setSwipedSubscriptions((prev) => ({
-          ...prev,
-          cancelled: [...prev.cancelled, currentSubscription],
-        }))
+        // Already in cancelled list, just confirm the cancellation
         setCurrentIndex(currentIndex - 1)
       } else {
-        // Keep Scene+ partner
+        // Keep Scene+ partner - remove from cancelled and add to kept
         setSwipedSubscriptions((prev) => ({
           ...prev,
+          cancelled: prev.cancelled.filter(sub => sub.id !== currentSubscription.id),
           kept: [...prev.kept, currentSubscription],
         }))
         setCurrentIndex(currentIndex - 1)
@@ -927,6 +934,7 @@ export default function App() {
     setSwipedSubscriptions({ kept: [], cancelled: [] })
     setShowResults(false)
     setLastDirection(undefined)
+    setRecognizedTransactions(new Set())
   }
 
   const goBackToHomepage = () => {
@@ -1015,7 +1023,7 @@ export default function App() {
                             </a>
                           </div>
                         )}
-                        {!sub.isKnownPartner && !sub.isBigCompany && (
+                        {!sub.isBigCompany && !sub.isKnownPartner && (
                           <div className="text-xs text-gray-400 mt-1 space-y-1">
                             <div className="flex items-center gap-1">
                               <Phone className="w-3 h-3" />
@@ -1078,7 +1086,10 @@ export default function App() {
           <ChevronLeft className="w-5 h-5 mr-2" />
           Back to Scotia Banking
         </Button>
-        <h1 className="text-4xl font-bold text-white mb-2">ScotiaSwipe</h1>
+        <div className="flex items-center gap-3 mb-2">
+          <img src="/logo_scotia.png" alt="Scotiabank" className="h-12 w-auto brightness-0 invert" />
+          <h1 className="text-4xl font-bold text-white">ScotiaSwipe</h1>
+        </div>
         <p className="text-red-100">Swipe right to keep, left to cancel</p>
         <p className="text-sm text-red-200 mt-1">
           {currentIndex + 1} of {mockSubscriptions.length} subscriptions
@@ -1132,17 +1143,17 @@ export default function App() {
                       </Badge>
                     )}
                   </div>
-                </div>
 
-                <div className="text-center">
-                  <p className="text-gray-300 text-sm leading-relaxed mb-4">{subscription.description}</p>
-
-                  {subscription.isKnownPartner && (
-                    <div className="bg-gradient-to-r from-red-600 to-yellow-500 text-white p-3 rounded-lg mb-2">
+                  {subscription.isKnownPartner && subscription.scenePointsMonthly && (
+                    <div className="bg-gradient-to-r from-red-600 to-yellow-500 text-white p-3 rounded-lg mb-4">
                       <Badge className="mb-2 bg-white text-red-600">✨ Scene+ Partner ✨</Badge>
                       <p className="text-xs">Earn {subscription.scenePointsMonthly} Scene+ points monthly!</p>
                     </div>
                   )}
+                </div>
+
+                <div className="text-center">
+                  <p className="text-gray-300 text-sm leading-relaxed mb-4">{subscription.description}</p>
 
                   {subscription.flags.includes("suspicious") && (
                     <div className="text-xs text-red-400 bg-red-900/20 p-2 rounded">
@@ -1186,84 +1197,81 @@ export default function App() {
 
       {/* Unknown Subscription Modal */}
       <Dialog open={showUnknownModal} onOpenChange={setShowUnknownModal}>
-        <DialogContent className="max-w-xs mx-auto bg-gray-800 border-gray-700 text-white p-3">
+        <DialogContent className="bg-gray-800 border-gray-700 text-white">
           <DialogHeader>
             <DialogTitle className="text-white text-center text-sm">Do you recognize this subscription?</DialogTitle>
           </DialogHeader>
-          <div className="text-center py-1">
+          <div className="text-center py-3">
             {currentSubscription && (
               <>
                 <img
                   src={currentSubscription.logo || "/placeholder.svg"}
                   alt={currentSubscription.name}
-                  className="w-10 h-10 mx-auto mb-2 rounded-lg"
+                  className="w-16 h-16 mx-auto mb-3 rounded-lg"
                 />
-                <h3 className="font-bold text-sm mb-1 text-white">{currentSubscription.name}</h3>
-                <p className="text-gray-400 text-xs mb-2">${currentSubscription.cost}/month</p>
+                <h3 className="font-bold text-base mb-2 text-white">{currentSubscription.name}</h3>
+                <p className="text-gray-400 text-sm mb-3">${currentSubscription.cost}/month</p>
               </>
             )}
           </div>
-          <DialogFooter className="flex-col gap-2">
-            <div className="flex gap-2 w-full">
+          <DialogFooter className="flex-col gap-3">
+            <div className="flex flex-col gap-2 w-full">
               <Button
                 onClick={() => handleUnknownRecognize(true)}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-1 text-xs h-7"
+                className="w-full bg-red-600 hover:bg-red-700 text-white py-2 text-sm h-10"
               >
                 Yes, I recognize this
               </Button>
               <Button
                 onClick={() => handleUnknownRecognize(false)}
                 variant="destructive"
-                className="flex-1 py-1 text-xs h-7"
+                className="w-full py-2 text-sm h-10"
               >
                 No, this looks suspicious
               </Button>
             </div>
-            <div className="text-xs text-center text-gray-400 mt-2 p-2 bg-gray-900 rounded">
-              <Phone className="w-3 h-3 inline mr-1" />
-              <div className="text-xs">
-                Fraud Dept: <span className="font-mono">1-800-4SCOTIA (1-800-472-6842)</span>
-              </div>
-            </div>
+
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Scene+ Modal */}
       <Dialog open={showSceneModal} onOpenChange={setShowSceneModal}>
-        <DialogContent className="max-w-xs mx-auto bg-gray-800 border-gray-700 text-white p-3">
+        <DialogContent className="bg-gray-800 border-gray-700 text-white">
           <DialogHeader>
             <DialogTitle className="text-white text-center text-sm">Cancel Scene+ Partner?</DialogTitle>
           </DialogHeader>
-          <div className="text-center py-1">
+          <div className="text-center py-3">
             {currentSubscription && (
               <>
                 <img
                   src={currentSubscription.logo || "/placeholder.svg"}
                   alt={currentSubscription.name}
-                  className="w-8 h-8 mx-auto mb-2 rounded"
+                  className="w-16 h-16 mx-auto mb-3 rounded-lg"
                 />
-                <h3 className="font-bold text-sm mb-2 text-white">{currentSubscription.name}</h3>
-                <div className="bg-gradient-to-r from-red-600 to-yellow-500 text-white p-1.5 rounded text-xs mb-2 max-w-48 mx-auto">
-                  <p className="text-xs">You'll lose</p>
-                  <p className="text-sm font-bold">{currentSubscription.scenePointsMonthly} Scene+ points</p>
-                  <p className="text-xs">
+                <h3 className="font-bold text-base mb-3 text-white">{currentSubscription.name}</h3>
+                <div className="bg-gradient-to-r from-red-600 to-yellow-500 text-white p-3 rounded-lg text-sm mb-3 mx-auto">
+                  <p className="text-sm">You'll lose</p>
+                  <p className="text-base font-bold">{currentSubscription.scenePointsMonthly} Scene+ points</p>
+                  <p className="text-sm">
                     per month (${(currentSubscription.scenePointsMonthly! * 0.01).toFixed(2)} value)
                   </p>
                 </div>
               </>
             )}
           </div>
-          <DialogFooter className="flex flex-col gap-2 items-start">
-            <Button onClick={() => handleSceneConfirm(true)} variant="destructive" className="w-32 h-8 text-xs">
-              Yes, cancel subscription
-            </Button>
-            <Button
-              onClick={() => handleSceneConfirm(false)}
-              className="w-32 h-8 bg-red-600 hover:bg-red-700 text-white text-xs"
-            >
-              Keep my Scene+ points
-            </Button>
+          <DialogFooter className="flex-col gap-3">
+            <div className="flex flex-col gap-2 w-full">
+              <Button onClick={() => handleSceneConfirm(true)} variant="destructive" className="w-full h-10 text-sm">
+                Yes, cancel subscription
+              </Button>
+              <Button
+                onClick={() => handleSceneConfirm(false)}
+                className="w-full h-10 bg-red-600 hover:bg-red-700 text-white text-sm"
+              >
+                Keep my Scene+ points
+              </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
