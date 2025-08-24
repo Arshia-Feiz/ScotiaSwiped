@@ -309,8 +309,8 @@ function ScotiaBankingHomepage({
 
             <div className="space-y-3">
               <div>
-                <div className="text-white">Scene+ Visa card (4019)</div>
-                <div className="text-gray-400 text-sm">$496.11</div>
+                <div className="text-white">Scene+ Visa card (0001)</div>
+                <div className="text-gray-400 text-sm">$560.34</div>
               </div>
 
               <Button variant="ghost" className="text-blue-400 hover:text-blue-300 p-0 h-auto font-normal">
