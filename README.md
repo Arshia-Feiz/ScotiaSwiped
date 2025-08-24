@@ -4,7 +4,7 @@ A Tinder-style subscription management app for Scotia Bank customers. Swipe righ
 
 ## 🌐 Live Demo
 
-**Website**: [https://scotia-swiped-lgntwk0vj-arshia-feizs-projects.vercel.app](https://scotia-swiped-lgntwk0vj-arshia-feizs-projects.vercel.app)
+**Website**: [https://scotia-swiped-git-main-arshia-feizs-projects.vercel.app](https://scotia-swiped-git-main-arshia-feizs-projects.vercel.app)
 
 **Presentation**: [View Project Presentation](https://drive.google.com/file/d/1HZbx8AsVMsujwWS-S9Zy8TyZWX3hMv4j/view?usp=sharing)
 
