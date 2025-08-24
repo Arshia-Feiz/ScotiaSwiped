@@ -2,6 +2,12 @@
 
 A Tinder-style subscription management app for Scotia Bank customers. Swipe right to keep subscriptions, left to cancel them!
 
+## 🌐 Live Demo
+
+**Website**: [https://scotia-swiped-lgntwk0vj-arshia-feizs-projects.vercel.app](https://scotia-swiped-lgntwk0vj-arshia-feizs-projects.vercel.app)
+
+**Presentation**: [View Project Presentation](https://drive.google.com/file/d/1HZbx8AsVMsujwWS-S9Zy8TyZWX3hMv4j/view?usp=sharing)
+
 ## Features
 
 - **Scotia Banking Homepage**: Authentic Scotia Bank mobile app interface
